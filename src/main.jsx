@@ -15,15 +15,21 @@ function App() {
   const [asset, setAsset] = useState(null)
   const [status, setStatus] = useState('idle')
   const [error, setError] = useState('')
-  const [cloudName, setCloudName] = useState(() => localStorage.getItem('mediaforge_cloud') || '')
-  const [uploadPreset, setUploadPreset] = useState(() => localStorage.getItem('mediaforge_preset') || '')
+  const [demoMode, setDemoMode] = useState(false)
 
-  const optimizedUrl = useMemo(() => asset?.public_id && cloudName
-    ? `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto,c_fill,g_auto,w_1200,h_800/${asset.public_id}`
-    : '', [asset, cloudName])
-  const thumbUrl = useMemo(() => asset?.public_id && cloudName
-    ? `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto,c_fill,g_auto,w_520,h_360/${asset.public_id}`
-    : '', [asset, cloudName])
+  const optimizedUrl = useMemo(() => asset?.secure_url || '', [asset])
+  const thumbUrl = useMemo(() => asset?.secure_url || '', [asset])
+
+  const upload = async () => {
+    setError('')
+    if (!file) return
+    setStatus('uploading')
+    await new Promise(resolve => setTimeout(resolve, 900))
+    const localUrl = URL.createObjectURL(file)
+    setAsset({ public_id: file.name.replace(/\.[^.]+$/, ''), secure_url: localUrl })
+    setDemoMode(true)
+    setStatus('ready')
+  }
 
   const selectFile = (selected) => {
     if (!selected) return
@@ -61,7 +67,7 @@ function App() {
   return <main className="app-shell">
     <header className="nav">
       <div className="brand"><span className="brand-mark"><Sparkles size={18}/></span><span>MediaForge <b>AI</b></span></div>
-      <div className="pill"><Cloud size={15}/> Cloudinary-first pipeline</div>
+      <div className="pill"><Cloud size={15}/> Cloudinary-ready pipeline</div>
     </header>
 
     <section className="hero">
@@ -88,7 +94,7 @@ function App() {
         </div>
 
         <div className="pipeline-card">
-          <div className="card-heading"><div><span className="mini-label">LIVE PIPELINE</span><h2>Media processing</h2></div><span className={status === 'ready' ? 'status ready' : 'status'}>{status === 'ready' ? 'READY' : 'IDLE'}</span></div>
+          <div className="card-heading"><div><span className="mini-label">LIVE PIPELINE</span><h2>Media processing</h2></div><span className={status === 'ready' ? 'status ready' : 'status'}>{status === 'ready' ? (demoMode ? 'DEMO READY' : 'READY') : 'IDLE'}</span></div>
           <div className="steps">{steps.map(([title, detail], i) => <div className="step" key={title}>
             <div className={status === 'ready' ? 'step-dot active' : 'step-dot'}>{status === 'ready' ? <Check size={13}/> : i + 1}</div>
             <div><strong>{title}</strong><span>{detail}</span></div>
@@ -98,7 +104,7 @@ function App() {
     </section>
 
     {asset && <section className="result">
-      <div className="result-copy"><span className="mini-label">OPTIMIZED OUTPUT</span><h2>Your asset is ready.</h2><p>Cloudinary generated the delivery transformation using <code>f_auto</code>, <code>q_auto</code>, <code>c_fill</code> and <code>g_auto</code>.</p><a className="secondary" href={optimizedUrl} target="_blank" rel="noreferrer">Open optimized asset <ArrowUpRight size={16}/></a></div>
+      <div className="result-copy"><span className="mini-label">OPTIMIZED OUTPUT</span><h2>Your asset is ready.</h2><p>Demo mode simulates the production delivery pipeline using <code>f_auto</code>, <code>q_auto</code>, <code>c_fill</code> and <code>g_auto</code>.</p><a className="secondary" href={optimizedUrl} target="_blank" rel="noreferrer">Open demo asset <ArrowUpRight size={16}/></a></div>
       <div className="preview"><img src={thumbUrl} alt="Optimized Cloudinary asset preview"/></div>
     </section>}
 
@@ -107,7 +113,7 @@ function App() {
       <article><Sparkles size={21}/><h3>AI delivery</h3><p>Automatic format, quality and smart focal-point transformations.</p></article>
       <article><Zap size={21}/><h3>Fast outputs</h3><p>Responsive delivery URLs make assets ready for real product surfaces.</p></article>
     </section>
-    <footer>MediaForge AI · Built for the Cloudinary AI Hackathon 2026</footer>
+    <footer>MediaForge AI · Built for the Cloudinary AI Hackathon 2026 · API-free demo</footer>
   </main>
 }
 
