@@ -15,8 +15,8 @@ function App() {
   const [asset, setAsset] = useState(null)
   const [status, setStatus] = useState('idle')
   const [error, setError] = useState('')
-  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
-  const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
+  const [cloudName, setCloudName] = useState(() => localStorage.getItem('mediaforge_cloud') || '')
+  const [uploadPreset, setUploadPreset] = useState(() => localStorage.getItem('mediaforge_preset') || '')
 
   const optimizedUrl = useMemo(() => asset?.public_id && cloudName
     ? `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto,c_fill,g_auto,w_1200,h_800/${asset.public_id}`
@@ -34,7 +34,7 @@ function App() {
     setError('')
     if (!file) return
     if (!cloudName || !uploadPreset) {
-      setError('Configure VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET in .env.local.')
+      setError('Enter your Cloudinary Cloud Name and unsigned Upload Preset below.')
       return
     }
     setStatus('uploading')
@@ -50,6 +50,12 @@ function App() {
     } catch (err) {
       setError(err.message || 'Upload failed.'); setStatus('idle')
     }
+  }
+
+  const saveConfig = () => {
+    localStorage.setItem('mediaforge_cloud', cloudName.trim())
+    localStorage.setItem('mediaforge_preset', uploadPreset.trim())
+    setError('')
   }
 
   return <main className="app-shell">
@@ -70,6 +76,11 @@ function App() {
           <p>Images or video · sent directly to Cloudinary</p>
           <label className="choose">Choose file<input type="file" accept="image/*,video/*" onChange={e => selectFile(e.target.files?.[0])}/></label>
           {file && <div className="file-name"><ImageIcon size={15}/> {file.name}</div>}
+          <div className="config">
+            <input value={cloudName} onChange={e => setCloudName(e.target.value)} placeholder="Cloud Name" aria-label="Cloud Name" />
+            <input value={uploadPreset} onChange={e => setUploadPreset(e.target.value)} placeholder="Unsigned Upload Preset" aria-label="Unsigned Upload Preset" />
+            <button className="save-config" onClick={saveConfig}>Save Cloudinary config</button>
+          </div>
           <button className="primary" onClick={upload} disabled={!file || status === 'uploading'}>
             {status === 'uploading' ? <><LoaderCircle className="spin" size={17}/> Uploading…</> : <><Play size={16}/> Run Cloudinary Pipeline</>}
           </button>
