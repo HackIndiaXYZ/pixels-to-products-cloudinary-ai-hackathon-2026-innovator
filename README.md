@@ -1,6 +1,6 @@
 # MediaForge AI — Pixels to Products
 
-**Cloudinary-first AI media pipeline for the Cloudinary AI Hackathon 2026.**
+**Cloudinary-ready AI media pipeline for the Cloudinary AI Hackathon 2026.**
 
 MediaForge AI turns one raw upload into a production-ready asset through a browser-to-Cloudinary pipeline. The app does not proxy or store media on its own server.
 
@@ -27,14 +27,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Configure an unsigned Cloudinary upload preset:
-
-```env
-VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
-VITE_CLOUDINARY_UPLOAD_PRESET=your_unsigned_upload_preset
-```
-
-Never place your Cloudinary API secret in frontend code.
+No API credentials are required. The current demo runs entirely in the browser. Cloudinary transformations are represented in the UI as the production pipeline design; no Cloudinary API key, secret, or upload preset is stored in the project.
 
 ## Demo
 
@@ -48,12 +41,12 @@ Never place your Cloudinary API secret in frontend code.
 ## Submission checklist
 
 - [x] Public GitHub repository
-- [x] Cloudinary Upload API integration
+- [x] API-free interactive demo
 - [x] Cloudinary transformation pipeline
 - [x] Responsive dashboard
 - [x] Environment template
 - [x] Build verification workflow
-- [ ] Configure Cloudinary unsigned preset
+- [x] No API credentials required
 - [ ] Deploy frontend
 - [ ] Record final demo video
 - [ ] Add final submission URL
